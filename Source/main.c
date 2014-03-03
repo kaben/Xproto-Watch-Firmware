@@ -244,6 +244,7 @@ int main(void) {
 
     // Initialize LCD
     GLCD_LcdInit();
+	SwitchBuffer();
     //memcpy_P(Disp_send.display_data+286,  &LOGO, 69);   // Gabotronics
 	//GLCD_setting();
     //tiny_printp(50,7,VERSION);
@@ -296,18 +297,10 @@ int main(void) {
         show_display(); WaitDisplay();
     }*/
     Key=K1;
-    uint8_t item=2, animating=0;   // Menu item
+    uint8_t item=4, animating=0;   // Menu item
     uint8_t old_item=0;
     int8_t step=15,from=-101;
-    
-    
-    
-   
-    
-    
-    
-    
-    
+	
     for(;;) {
         // Check User Input
         if(testbit(Key, userinput)) {
@@ -341,6 +334,7 @@ int main(void) {
                         CPU_Fast();
                         RTC.INTCTRL = 0x00;     // Disable low level interrupts (Compare)
                         // 1Hz Memory LCD EXTCOMM
+						PR.PRPD  = 0x6C;        // Stop: TWI,       , USART1, SPI, HIRES
                         TCD0.CTRLB = 0b00010000;            // Enable HCMPENA, pin4
                         TCD0.CCAH = 128;                      // Automatic EXTCOMM with Timer D0                        
                         MSO();              // go to MSO
@@ -375,6 +369,7 @@ int main(void) {
             }
         }
         if(item!=old_item) {
+			PR.PRPE  = 0x6C;        // Stop: TWI,       , USART1, SPI, HIRES
             TCE1.CTRLB = 0b00110001;        // Enable output compares, waveform mode
             TCE1.CCA = 250;                 // 4KHz (CPU @ 2MHz)
             TCE1.CTRLA = 0x02;              // Enable timer
@@ -389,6 +384,7 @@ int main(void) {
                 WaitDisplay();
                 TCE1.CTRLA = 0;             // Disable timer
                 TCE1.CTRLB = 0;
+				PR.PRPE  = 0xFF;
                 PORTE.OUT = 0x00;
             }
             lcd_goto(16,2);
@@ -440,6 +436,8 @@ ISR(PORTF_INT0_vect) {
         setbit(VPORT1.OUT,0);
         _delay_ms(1000);
         clrbit(VPORT1.OUT,0);
+		if(!testbit(PORTF.IN, 6)) Jump_boot1();
+		if(!testbit(PORTF.IN, 0)) Jump_boot2();
     }        
     //if(!testbit(in,7))  // Light
     if(testbit(Display, flip)) {
@@ -833,3 +831,4 @@ void PowerDown(void) {
 ISR(TCD2_HUNF_vect) {
     SLEEP.CTRL = 0x00;
 }
+

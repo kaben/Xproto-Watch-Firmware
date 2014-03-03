@@ -386,7 +386,7 @@ void MSO(void) {
     DACB.CTRLB        = 0x22;   // CH1 auto triggered by an event
     DACB.CTRLC        = 0x11;   // Use AREFA (2.0V), data is left adjusted
     DACB.EVCTRL       = 0x03;   // Event CH3 triggers the DAC Conversion
-    DACB.TIMCTRL      = 0x50;   // Minimum 32 CLK between conversion (1uS)
+
     //DACB.CH0GAINCAL = eeprom_read_byte(&EEDACgain);      // Load DAC gain calibration
     //DACB.CH0OFFSETCAL = eeprom_read_byte(&EEDACoffset);  // Load DAC offset calibration
     DACB.CTRLA = 0x09;          // Enable DACB and CH1

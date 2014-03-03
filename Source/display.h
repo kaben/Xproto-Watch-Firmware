@@ -77,6 +77,7 @@ void GLCD_Putchar (char);
 void putchar5x8(char u8Char);
 void printN(uint8_t Data);
 void printN5x8(uint8_t Data);
+void SwitchBuffer(void);
 void clr_display(void);
 void dma_display(void);
 void set_pixel(uint8_t x, uint8_t y);

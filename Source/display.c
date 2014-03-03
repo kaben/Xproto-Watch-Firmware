@@ -820,22 +820,23 @@ Send a run length encoded image from program memory to the LCD
 void bitmap(uint8_t x, uint8_t y, const uint8_t *BMP) {
     uint8_t *p;
   	uint8_t row=0,col=0;
-	uint8_t data=0,count=0,width,height;
-    uint16_t i;
+	uint8_t data=0,count=0;
+	uint8_t width,height;
+    uint8_t const *b;
     width=pgm_read_byte(&BMP[0]);
     height=pgm_read_byte(&BMP[1])/8;
-    i=&BMP[2];
+    b=&BMP[2];
     p= &Disp_send.buffer[(uint16_t)((127-x)*18)+y];
   	for ( ; col < width; col++) {
 		for (row=0; row<height; row++) {
 			if(count==0) {
-				data = pgm_read_byte(i++);
-				if(data==pgm_read_byte(i++)) {
-					count = pgm_read_byte(i++);
+				data = pgm_read_byte(b++);
+				if(data==pgm_read_byte(b++)) {
+					count = pgm_read_byte(b++);
 				}
 				else {
 					count = 1;
-					i--;
+					b--;
 				}
 			}
 			count--;
@@ -867,30 +868,30 @@ Send a run length encoded image from program memory to the LCD
 ----------------------------------------------------------------------------*/
 void bitmap_safe(int8_t x, int8_t y, const uint8_t *BMP, uint8_t c) {
     uint8_t *p;
-  	int8_t row=0,col=0;
+  	uint8_t row=0,col=0;
 	uint8_t data=0,count=0;
     int16_t width,height;
-	uint16_t i;
-   
-    width=pgm_read_byte(&BMP[0])+x;
+	uint8_t const *b;
+    width=pgm_read_byte(&BMP[0]);
     height=pgm_read_byte(&BMP[1])/8;
-    i=&BMP[2];    
+    b=&BMP[2];    
     if(BMP==0 || width<0 || y+height<=0) return;
     p= &Disp_send.buffer[(uint16_t)((127-x)*18)+y];
-  	for ( ; x < width; x++) {
+  	for ( ; col < width; col++) {
 		for (row=0; row<height; row++) {
 			if(count==0) {
-				data = pgm_read_byte(i++);
-				if(data==pgm_read_byte(i++)) {
-					count = pgm_read_byte(i++);
+				data = pgm_read_byte(b++);
+				if(data==pgm_read_byte(b++)) {
+					count = pgm_read_byte(b++);
 				}
 				else {
 					count = 1;
-					i--;
+					b--;
 				}
 			}
 			count--;
-            if(x>=0 && x<128 && (y+row)>=0 && (y+row)<16) {
+//            if(x>=0 && x<128 && (y+row)>=0 && (y+row)<16) {
+            if(p>=Disp_send.buffer && p<(Disp_send.buffer+18*128)) {
                 if(c==0)        *p &= data;
                 else if(c==1)   *p |= data;
                 else if(c==2)   *p &= ~data;
@@ -900,6 +901,6 @@ void bitmap_safe(int8_t x, int8_t y, const uint8_t *BMP, uint8_t c) {
             }
             p++;
 		}
-        p-=18+height;
+        p-=18+height;   // Next line
 	}
 }

@@ -68,8 +68,6 @@ void GLCD_LcdInit(void)	{
     }
     Disp_send.buffer1[DISPLAY_DATA_SIZE-1] = STATIC_MODE;
     Disp_send.buffer2[DISPLAY_DATA_SIZE-1] = STATIC_MODE;
-    Disp_send.buffer=Disp_send.buffer1;
-    Disp_send.spidata=Disp_send.display_setup1;
 }
 
 void GLCD_LcdOff(void)	{

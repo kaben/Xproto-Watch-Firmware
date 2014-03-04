@@ -254,7 +254,7 @@ static inline void EVENT_USB_Device_ControlRequest(struct USB_Request_Header* re
 			case 0xBB: // disconnect from USB, jump to bootloader
 				USB_ep_in_start(0, 0);
 				USB_ep0_wait_for_complete();
-				Jump_boot1();
+				Jump_boot();
 					
 /*		    default:    // Unknown request
     			endpoints[0].out.CTRL |= USB_EP_STALL_bm;
@@ -263,7 +263,7 @@ static inline void EVENT_USB_Device_ControlRequest(struct USB_Request_Header* re
         USB_ep_in_start(0, 0);
 	}
 }
-
+/*
 void Jump_boot1(void) {
 	cli();
 	_delay_ms(10);
@@ -272,9 +272,9 @@ void Jump_boot1(void) {
 	void (*start_bootloader) (void) = (void (*)(void))(BOOT_SECTION_START/2+0x1FC/2);
 	EIND = BOOT_SECTION_START>>17;
 	start_bootloader();
-}
+}*/
 
-void Jump_boot2(void) {
+void Jump_boot(void) {
 	cli();
 	_delay_ms(10);
 	USB.CTRLB &= ~USB_ATTACH_bm;    // disconnects the device from the USB lines

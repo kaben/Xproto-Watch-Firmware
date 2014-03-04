@@ -94,5 +94,5 @@ inline void USB_ep0_wait_for_complete(void) {
 uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,
                                     const uint8_t wIndex,
                                     const void** const DescriptorAddress);
-void Jump_boot1(void);
-void Jump_boot2(void);
+void Jump_boot(void);
+

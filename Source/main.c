@@ -436,8 +436,7 @@ ISR(PORTF_INT0_vect) {
         setbit(VPORT1.OUT,0);
         _delay_ms(1000);
         clrbit(VPORT1.OUT,0);
-		if(!testbit(PORTF.IN, 6)) Jump_boot1();
-		if(!testbit(PORTF.IN, 0)) Jump_boot2();
+		if(!testbit(PORTF.IN, 6)) Jump_boot();
     }        
     //if(!testbit(in,7))  // Light
     if(testbit(Display, flip)) {

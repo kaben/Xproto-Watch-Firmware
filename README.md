@@ -4,6 +4,9 @@ Xproto-Watch
 Source Code for the Oscilloscope Watch
 http://www.gabotronics.com/oscilloscopes/oscilloscope-watch.htm
 
+The project is developed using Atmel Studio 6, available from atmel.com
+
+
 The Oscilloscope Watch has all the features of a modern watch (time, calendar, alarm, etc...) combined with all the features of the popular Xprotolab (Oscilloscope, Waveform Generator, Logic Analyzer, Protocol Sniffer, Frequency Counter). The Xprotolab has been featured in several other online magazines, such as Hack a Day. and Elektor.
 
 Features:

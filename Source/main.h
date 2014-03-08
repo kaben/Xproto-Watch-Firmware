@@ -72,11 +72,7 @@ email me at: gabriel@gabotronics.com
 #define tick        1       // Bit gets flipped on every screen  refresh
 #define military    2       // 12 or 24 hour
 #define seconds     3       // Display seconds
-/*#define chinvert    4       // Invert channel
-#define chaverage   5       // Average samples
-#define chmath      6       // math (Subtract or Multiply active)
-#define submult     7       // Subtract or Multiply
-*/
+
 
 // CH1ctrl bits    (GPIO1)
 // CH2ctrl bits    (GPIO2)

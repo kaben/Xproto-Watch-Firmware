@@ -193,13 +193,13 @@ uint8_t EEMEM EEDACgain   = 0;      // DAC gain calibration
 uint8_t EEMEM EEDACoffset = 0;      // DAC offset calibration
 
 time_var now = {
-    0,          // Half Seconds [0-119]
-    28,         // Minutes      [0-59]
-    7,          // Hours        [0-23]
-    20,         // Day          [0-30]
-    1,          // Month        [0-11]  January is 0
-    14,         // Year since 2000
-    6,          // Day of week  [0-6]   Saturday is 0
+    0,          // halfsec  Half Seconds [0-119]
+    28,         // min      Minutes      [0-59]
+    7,          // hour     Hours        [0-23]
+    0,          // mday     Day          [0-30]
+    2,          // mon      Month        [0-11]  January is 0
+    14,         // year     Year since 2000
+    0,          // wday     Day of week  [0-6]   Saturday is 0
 };
 
 //static void CalibrateDAC(void);
@@ -297,7 +297,7 @@ int main(void) {
         show_display(); WaitDisplay();
     }*/
     Key=K1;
-    uint8_t item=4, animating=0;   // Menu item
+    uint8_t item=1, animating=0;   // Menu item
     uint8_t old_item=0;
     int8_t step=15,from=-101;
 	

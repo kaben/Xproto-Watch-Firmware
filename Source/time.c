@@ -25,7 +25,9 @@ void face2(void);
 int8_t Sine(int8_t angle);
 int8_t Cosine(int8_t angle);
 uint8_t firstdayofmonth(time_var *timeptr);
+void findweekday(time_var *timeptr);
 
+// 60 value sine table
 const int8_t SIN60[] PROGMEM = {
     0,     13,  26,  39,  51,  63,  74,  84,  94, 102, 109, 116, 120, 124, 126,
     127,  126, 124, 120, 116, 109, 102,  94,  84,  74,  63,  51,  39,  26,  13,
@@ -58,7 +60,14 @@ const char days[][4] PROGMEM = {           // Days of the week, Jan-1-2000 was S
     "Sat","Sun","Mon","Tue","Wed","Thu","Fri"
 };
 
-uint8_t Face=0;
+uint8_t Selected=0;   // Selected item to change
+#define SECOND      1
+#define MINUTE      2
+#define HOUR        3
+#define DAY         4
+#define MONTH       5
+#define YEAR        6
+
 uint8_t options;    // Daylight saving time
                     // Military format
                     // Watch face
@@ -137,11 +146,13 @@ int8_t Cosine(int8_t angle) {
 // Digital Watch Face
 void face0(void) {
     uint8_t n,d=0;
-    if(testbit(WOptions,seconds)) {
-        n=now.halfsec>>1;
-        while (n>=10) { d++; n-=10; }
-        bitmap(104,10,(int16_t)pgm_read_word(sDIGITS+d));
-        bitmap(117,10,(int16_t)pgm_read_word(sDIGITS+n));
+    if(testbit(WOptions,seconds) || Selected) {
+        if(!testbit(now.halfsec,0) || Selected!=SECOND ) {  // Flash when changing
+            n=now.halfsec>>1;
+            while (n>=10) { d++; n-=10; }
+            bitmap(104,10,(int16_t)pgm_read_word(sDIGITS+d));
+            bitmap(117,10,(int16_t)pgm_read_word(sDIGITS+n));
+        }
         // Only draw seconds
 //        if(now.halfsec!=0 && !testbit(WOptions,update)) return;
     }        
@@ -149,28 +160,36 @@ void face0(void) {
     bitmap(2,0,BATTERY);
     lcd_goto(74,0);
     lcd_put5x8(PSTR("8:00 AM"));
-    n=now.hour; 
-    if(n>=12) { n-=12; bitmap(117,8,PM); }
-    else bitmap(105,8,AM);
-    if(n==0) n=12;
-    if(n>=10) { n-=10; bitmap(0,8,DIGI1); }
-    bitmap(25,8,(int16_t)pgm_read_word(DIGITS+n));
+    if(!testbit(now.halfsec,0) || Selected!=HOUR ) {  // Flash when changing
+        n=now.hour; 
+        if(n>=12) { n-=12; bitmap(117,8,PM); }
+        else bitmap(105,8,AM);
+        if(n==0) n=12;
+        if(n>=10) { n-=10; bitmap(0,8,DIGI1); }
+        bitmap(25,8,(int16_t)pgm_read_word(DIGITS+n));
+    }
     bitmap(49,8,DOTS);
-    n=now.min; d=0;
-    while (n>=10) { d++; n-=10; }
-    bitmap(55,8,(int16_t)pgm_read_word(DIGITS+d));
-    bitmap(80,8,(int16_t)pgm_read_word(DIGITS+n));
+    if(!testbit(now.halfsec,0) || Selected!=MINUTE ) {  // Flash when changing
+        n=now.min; d=0;
+        while (n>=10) { d++; n-=10; }
+        bitmap(55,8,(int16_t)pgm_read_word(DIGITS+d));
+        bitmap(80,8,(int16_t)pgm_read_word(DIGITS+n));
+    }
     // Date
     n=now.wday;
     bitmap(3,3,(int16_t)pgm_read_word(mWEEK+n));
-    n=now.mon+1;    // Month.       [0-11]
-    if(n>=10) { n-=10; bitmap(49,3,mDIGI1); }
-    bitmap(65,3,(int16_t)pgm_read_word(mDIGITS+n));
+    if(!testbit(now.halfsec,0) || Selected!=MONTH ) {  // Flash when changing
+        n=now.mon+1;    // Month.       [0-11]
+        if(n>=10) { n-=10; bitmap(49,3,mDIGI1); }
+        bitmap(65,3,(int16_t)pgm_read_word(mDIGITS+n));
+    }
     bitmap(80,3,mDIGIdash);
-    n=now.mday+1; d=0; // Day.         [0-30]
-    while (n>=10) { d++; n-=10; }
-    bitmap(95,3,(int16_t)pgm_read_word(mDIGITS+d));
-    bitmap(111,3,(int16_t)pgm_read_word(mDIGITS+n));
+    if(!testbit(now.halfsec,0) || Selected!=DAY ) {  // Flash when changing
+        n=now.mday+1; d=0; // Day.         [0-30]
+        while (n>=10) { d++; n-=10; }
+        bitmap(95,3,(int16_t)pgm_read_word(mDIGITS+d));
+        bitmap(111,3,(int16_t)pgm_read_word(mDIGITS+n));
+    }
 }
 
 // Analog Watch Face
@@ -205,19 +224,22 @@ void WATCH(void) {
     uint8_t *p;    
     uint8_t newface=0;
     uint8_t Faces=0;
+    uint8_t Change_timeout;
     setbit(WOptions,update);
     do {
         // Refresh screen?
-        if(  testbit(WOptions,update) ||                            // Forced update
+        if(  Selected ||                          // Changing the time
+             testbit(WOptions,update) ||                            // Forced update
            (!testbit(WOptions,seconds) && now.halfsec==0) ||        // Every minute
            ( testbit(WOptions,seconds) && (!testbit(now.halfsec,0))) ) {   // Every second or minute in low power
                     
-            if(testbit(WOptions,seconds)) dma_display();    // Don't use double buffer in low power
+            if(testbit(WOptions,seconds)) dma_display();    // Don't use double buffer in low power (not displaying seconds)
             SwitchBuffer();
             clr_display();
             switch(Faces) {
                 case 0: face0(); break;
                 case 1: face1(); break;
+				case 2: face2(); break;
             }
             if(!testbit(WOptions,seconds)) {   // Don't use double buffer in low power
                 dma_display();
@@ -241,7 +263,47 @@ void WATCH(void) {
                 if(Faces==2) togglebit(WOptions, seconds);
                 newface=2;
             }*/
+            if(testbit(Key,KM)) {
+                Selected++;
+                if(Selected>YEAR) Selected=0;
+            }
+            if(Selected) {
+                Change_timeout = 120;   // 120 half seconds -> 1 Minute
+                cli();  // Prevent the RTC interrupt from changing the time in this block
+                switch(Selected) {
+                    case SECOND:
+                        if(testbit(Key,KI)) if(now.halfsec<119) now.halfsec++;
+                        if(testbit(Key,KD)) if(now.halfsec) now.halfsec--;
+                    break;
+                    case MINUTE:
+                        if(testbit(Key,KI)) if(now.min<59) now.min++;
+                        if(testbit(Key,KD)) if(now.min) now.min--;
+                    break;
+                    case HOUR:
+                        if(testbit(Key,KI)) if(now.hour<59) now.hour++;
+                        if(testbit(Key,KD)) if(now.hour) now.hour--;
+                    break;
+                    case DAY:
+                        if(testbit(Key,KI)) if(now.mday<pgm_read_byte_near(monthDays+now.mon)-1) now.mday++;
+                        if(testbit(Key,KD)) if(now.mday) now.mday--;
+                    break;
+                    case MONTH:
+                        if(testbit(Key,KI)) if(now.mon<11) now.mon++;
+                        if(testbit(Key,KD)) if(now.mon) now.mon--;
+                    break;
+                    case YEAR:
+                        if(testbit(Key,KI)) if(now.year<98) now.year++;
+                        if(testbit(Key,KD)) if(now.year) now.year--;
+                    break;
+                }
+                findweekday(&now);
+                sei();
+            }
         }
+        if(Change_timeout==0) {
+            Selected=0;
+        }
+        else Change_timeout--;
         if(Faces!=newface) {    // The watch face has changed
             Faces=newface;
             switch(Faces) {
@@ -426,9 +488,26 @@ void settime(time_var *timeptr) {
     RTC.CNT = second;
 }
 
-// Return week day of the first day of the month of a given date
+// Returns the column number for the calendar display, last column is Saturday = 6
 uint8_t firstdayofmonth(time_var *timeptr) {
-    uint16_t days;  // Days since 2000-01-01
+    static uint16_t days;  // Days since 2000-01-01
+    
+    days = (timeptr->year)*365;
+    // add extra days for leap years
+    for (uint8_t i=0; i<timeptr->year; i++) {
+        if (LEAP_YEAR(i)) days++;
+    }
+    // add days for this year
+    for (uint8_t i=0; i<timeptr->mon; i++) {
+        days += pgm_read_byte_near(monthDays+i);
+        if (i==1 && LEAP_YEAR(timeptr->year)) days++;
+    }
+    return ((days+6)%7);    // 2000-01-01 was Saturday ==> Add 6
+}
+
+// Finds the correct day of the week for a given date, Saturday = 0;
+void findweekday(time_var *timeptr) {
+    static uint16_t days;  // Days since 2000-01-01
     
     days = (timeptr->year)*365;
     // add extra days for leap years
@@ -441,6 +520,6 @@ uint8_t firstdayofmonth(time_var *timeptr) {
         if (i==1 && LEAP_YEAR(timeptr->year)) days++;
     }
     // add remaining days in month
-//    days += timeptr->mday;
-    return ((days+6)%7);    // 2000-01-01 was Saturday = 6
+    days += timeptr->mday;
+    timeptr->wday = (days%7);    // 2000-01-01 was Saturday = 0
 }

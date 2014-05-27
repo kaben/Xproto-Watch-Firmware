@@ -136,7 +136,7 @@ email me at: gabriel@gabotronics.com
 #include "time.h"
 
 const char mainmenutxt[][18] PROGMEM = {           // Menus:
-    "  Digital Watch  ",    // Watch
+    "Watch v1405270158",    // Watch
     "  Oscilloscope   ",    // Oscilloscope
     "Protocol Sniffer ",    // Sniffer
     "Frequency Counter",    // Counter
@@ -196,10 +196,10 @@ time_var now = {
     0,          // halfsec  Half Seconds [0-119]
     28,         // min      Minutes      [0-59]
     7,          // hour     Hours        [0-23]
-    0,          // mday     Day          [0-30]
-    2,          // mon      Month        [0-11]  January is 0
+    26,          // mday     Day          [0-30]
+    4,          // mon      Month        [0-11]  January is 0
     14,         // year     Year since 2000
-    0,          // wday     Day of week  [0-6]   Saturday is 0
+    3,          // wday     Day of week  [0-6]   Saturday is 0
 };
 
 //static void CalibrateDAC(void);
@@ -332,7 +332,6 @@ int main(void) {
                     if(testbit(Key,K1)) {
                         ANALOG_ON();
                         CPU_Fast();
-                        //RTC.INTCTRL = 0x00;     // Disable low level interrupts (Compare)
                         // 1Hz Memory LCD EXTCOMM
 						PR.PRPD  = 0x6C;        // Stop: TWI,       , USART1, SPI, HIRES
                         TCD0.CTRLB = 0b00010000;            // Enable HCMPENA, pin4
@@ -340,7 +339,6 @@ int main(void) {
                         MSO();              // go to MSO
                         TCD0.CTRLB = 0;
                         TCD0.CCAH = 0;
-                        //RTC.INTCTRL = 0x01;
                         CPU_Slow();
                         ANALOG_OFF();
                         old_item=0; step=15; from=-101;

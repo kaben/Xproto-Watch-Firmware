@@ -460,7 +460,6 @@ void MSO(void) {
                 TCC1.PERL = lobyte(Tpost);
                 TCC1.PERH = hibyte(Tpost);
                 TCC0.CNTL = TCC0.PERL;
-                RTC.INTCTRL = 0x00;     // Disable Menu Timeout interrupt
                 setbit(TCC0.INTFLAGS, TC2_LUNFIF_bp);    // Clear trigger timeout interrupt
                 if(testbit(Trigger, autotrg)) TCC0.INTCTRLA |= TC2_LUNFINTLVL_LO_gc; // Enable Trigger timeout Interrupt
                 uint8_t tlevelo;
@@ -510,8 +509,6 @@ void MSO(void) {
                 }
             }
         }
-        //RTC.INTCTRL = 0x04;     // Re enable Time out interrupt
-        RTC.INTCTRL = 0x01;     // Re enable Time out interrupt
         TCC0.INTCTRLA &= ~TC2_LUNFINTLVL_LO_gc; // Trigger timeout Interrupt not needed
 ///////////////////////////////////////////////////////////////////////////////
 // Finish acquiring data

@@ -332,7 +332,7 @@ int main(void) {
                     if(testbit(Key,K1)) {
                         ANALOG_ON();
                         CPU_Fast();
-                        RTC.INTCTRL = 0x00;     // Disable low level interrupts (Compare)
+                        //RTC.INTCTRL = 0x00;     // Disable low level interrupts (Compare)
                         // 1Hz Memory LCD EXTCOMM
 						PR.PRPD  = 0x6C;        // Stop: TWI,       , USART1, SPI, HIRES
                         TCD0.CTRLB = 0b00010000;            // Enable HCMPENA, pin4
@@ -340,7 +340,7 @@ int main(void) {
                         MSO();              // go to MSO
                         TCD0.CTRLB = 0;
                         TCD0.CCAH = 0;
-                        RTC.INTCTRL = 0x01;
+                        //RTC.INTCTRL = 0x01;
                         CPU_Slow();
                         ANALOG_OFF();
                         old_item=0; step=15; from=-101;

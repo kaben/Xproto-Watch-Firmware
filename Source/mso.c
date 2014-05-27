@@ -511,6 +511,7 @@ void MSO(void) {
             }
         }
         //RTC.INTCTRL = 0x04;     // Re enable Time out interrupt
+        RTC.INTCTRL = 0x01;     // Re enable Time out interrupt
         TCC0.INTCTRLA &= ~TC2_LUNFINTLVL_LO_gc; // Trigger timeout Interrupt not needed
 ///////////////////////////////////////////////////////////////////////////////
 // Finish acquiring data

@@ -136,7 +136,7 @@ email me at: gabriel@gabotronics.com
 #include "time.h"
 
 const char mainmenutxt[][18] PROGMEM = {           // Menus:
-    "Watch v1405270158",    // Watch
+    "Watch v1405270234",    // Watch
     "  Oscilloscope   ",    // Oscilloscope
     "Protocol Sniffer ",    // Sniffer
     "Frequency Counter",    // Counter

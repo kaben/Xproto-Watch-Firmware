@@ -177,7 +177,9 @@ void face0(void) {
     }
     // Date
     n=now.wday;
-    bitmap(3,3,(int16_t)pgm_read_word(mWEEK+n));
+    if(!testbit(now.halfsec,0) || Selected!=YEAR ) {  // Flash when changing
+        bitmap(3,3,(int16_t)pgm_read_word(mWEEK+n));
+	}
     if(!testbit(now.halfsec,0) || Selected!=MONTH ) {  // Flash when changing
         n=now.mon+1;    // Month.       [0-11]
         if(n>=10) { n-=10; bitmap(49,3,mDIGI1); }
